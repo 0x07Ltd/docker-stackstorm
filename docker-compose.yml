@@ -1,0 +1,108 @@
+api:
+  image: flyte/stackstorm-api
+  links:
+    - mongo
+    - rabbitmq
+  volumes_from:
+    - data
+  ports:
+    - "9101:9101"
+
+auth:
+  image: flyte/stackstorm-auth
+  links:
+    - api
+    - mongo
+  volumes_from:
+    - data
+  ports:
+    - "9100:9100"
+
+stream:
+  image: flyte/stackstorm-stream
+  links:
+    - mongo
+    - rabbitmq
+  volumes_from:
+    - data
+  ports:
+    - "9102:9102"
+
+notifier:
+  image: flyte/stackstorm-notifier
+  links:
+    - api
+    - mongo
+    - rabbitmq
+  volumes_from:
+    - data
+
+resultstracker:
+  image: flyte/stackstorm-resultstracker
+  links:
+    - api
+    - mongo
+    - rabbitmq
+  volumes_from:
+    - data
+
+rulesengine:
+  image: flyte/stackstorm-rulesengine
+  links:
+    - api
+    - mongo
+    - rabbitmq
+  volumes_from:
+    - data
+
+sensorcontainer:
+  image: flyte/stackstorm-sensorcontainer
+  links:
+    - api
+    - mongo
+    - rabbitmq
+  volumes_from:
+    - data
+
+garbagecollector:
+  image: flyte/stackstorm-garbagecollector
+  links:
+    - api
+    - mongo
+    - rabbitmq
+  volumes_from:
+    - data
+
+actionrunner:
+  image: flyte/stackstorm-actionrunner
+  links:
+    - api
+    - auth
+    - mongo
+    - rabbitmq
+  volumes_from:
+    - data
+  volumes:
+    - "./data/id_rsa:/home/stanley/.ssh/id_rsa"
+    - "./data/id_rsa.pub:/home/stanley/.ssh/id_rsa.pub"
+    - "./data/known_hosts:/home/stanley/.ssh/known_hosts"
+    - "./data/id_rsa:/root/.ssh/id_rsa"
+    - "./data/id_rsa.pub:/root/.ssh/id_rsa.pub"
+    - "./data/known_hosts:/root/.ssh/known_hosts"
+
+## External Services
+mongo:
+  image: mongo:3.2
+
+rabbitmq:
+  image: rabbitmq
+
+## Data container
+data:
+  build: ./data
+  volumes:
+    - /etc/st2
+    - /opt/stackstorm
+  links:
+    - rabbitmq
+    - mongo
