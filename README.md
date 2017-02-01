@@ -2,7 +2,10 @@ docker-stackstorm
 =================
 Contains the files required to run Stackstorm on Docker.
 
-#Usage
+Based heavily on the [Stackstorm st2-dockerfiles repository](https://github.com/stackstorm/st2-dockerfiles)
+but simplified and modified slightly for my own ease of use, and to use Docker Hub's auto-build functionality.
+
+##Usage
 Generate or copy the requisite SSH keys to the `data` directory:
 
 ```bash
@@ -32,4 +35,20 @@ htpasswd data/htpasswd <yourusername>
 Bring the stack up with `docker-compose`:
 ```bash
 docker-compose up -d
+```
+
+##Packs
+Once the services have started up and you're able to run commands with the `st2` CLI client, you may
+want to install a list of packs which your organisation uses.
+
+Create a file listing your requirements (`packs.txt`):
+```
+ansible
+git@bitbucket.org:0x07ltd/pack-yourpack.git
+git@bitbucket.org:0x07ltd/pack-yourotherpack.git
+```
+
+Install the packs:
+```bash
+xargs st2 pack install < packs.txt
 ```
